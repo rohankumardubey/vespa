@@ -5,7 +5,6 @@ import com.yahoo.vespa.model.container.configserver.option.ConfigOptions;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -77,7 +76,6 @@ public class ConfigEnvironmentVariables implements ConfigOptions {
     @Override
     public Optional<Boolean> useVespaVersionInRequest() {
         return Optional.ofNullable(System.getenv("VESPA_CONFIGSERVER_USE_VERSION_IN_CONFIG_REQUEST"))
-                .or(() -> getInstallVariable("use_vespa_version_in_request"))
                 .map(Boolean::parseBoolean);
     }
 
@@ -110,20 +108,6 @@ public class ConfigEnvironmentVariables implements ConfigOptions {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid config server " + configserverString, e);
         }
-    }
-
-    private static Optional<String> getInstallVariable(String name) {
-        return getInstallVariable(name, Function.identity());
-    }
-
-    private static <T> Optional<T> getInstallVariable(String name, Function<String, T> converter) {
-        return getRawInstallVariable("cloudconfig_server." + name).map(converter);
-    }
-
-    private static Optional<String> getRawInstallVariable(String name) {
-        return Optional.ofNullable(
-                Optional.ofNullable(System.getenv(name.replace(".", "__")))
-                        .orElseGet(() -> System.getProperty(name)));
     }
 
     private static Stream<String> multiValueParameterStream(String param) {
