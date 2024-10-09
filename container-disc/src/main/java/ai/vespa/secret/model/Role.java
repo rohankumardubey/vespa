@@ -21,7 +21,7 @@ public enum Role {
 
     public String forVault(VaultName vault) {
         return switch(this) {
-            case WRITER, READER -> vault.value() + "-" + value;
+            case WRITER, READER -> vault.value() + "." + value;
             case TENANT_SECRET_WRITER -> value;
         };
     }
