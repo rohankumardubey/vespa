@@ -3,16 +3,15 @@ package ai.vespa.secret.aws;
 import ai.vespa.secret.config.aws.AsmSecretConfig;
 import ai.vespa.secret.internal.TypedSecretStore;
 import ai.vespa.secret.model.Key;
-import ai.vespa.secret.model.Role;
 import ai.vespa.secret.model.Secret;
 import ai.vespa.secret.model.SecretVersionId;
 import ai.vespa.secret.model.SecretVersionState;
-import ai.vespa.secret.model.VaultName;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.yahoo.component.annotation.Inject;
 import com.yahoo.vespa.athenz.api.AthenzDomain;
+import com.yahoo.vespa.athenz.api.AwsRole;
 import com.yahoo.vespa.athenz.client.zts.DefaultZtsClient;
 import com.yahoo.vespa.athenz.client.zts.ZtsClient;
 import com.yahoo.vespa.athenz.identity.ServiceIdentityProvider;
@@ -58,13 +57,13 @@ public final class AsmSecretStore extends AsmSecretStoreBase implements TypedSec
     }
 
     private AsmSecretStore(ZtsClient ztsClient, AthenzDomain domain) {
-        super(ztsClient, Role.READER, domain);
+        super(ztsClient, domain);
         cache = initCache();
         closeable = ztsClient::close;
     }
 
     // For testing
-    AsmSecretStore(Function<VaultName, SecretsManagerClient> clientAndCredentialsSupplier) {
+    AsmSecretStore(Function<AwsRole, SecretsManagerClient> clientAndCredentialsSupplier) {
         super(clientAndCredentialsSupplier);
         cache = initCache();
         closeable = () -> {};
